@@ -2,7 +2,7 @@
 import os
 import subprocess
 
-CMAKE_TEMPALTE = """
+CMAKE_TEMPLATE = """
 cmake_minimum_required(VERSION %CMAKE_VERSION%)
 
 project(%REPO_NAME%)
@@ -18,7 +18,7 @@ MAIN_CPP_TEMPLATE= """
 #include<SDL.h>
 #include <iostream>
 
-int main()
+int main(int argc, char *argv[])
 {
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     main_cpp.close()
 
     cmake_list_txt = open(os.path.join(project_path, "CMakeLists.txt"),"x")
-    cmake_list_txt.write(CMAKE_TEMPALTE.replace("%CMAKE_VERSION%",version).replace("%REPO_NAME%",project_name))
+    cmake_list_txt.write(CMAKE_TEMPLATE.replace("%CMAKE_VERSION%",version).replace("%REPO_NAME%",project_name))
     cmake_list_txt.close()
 
     git_ignore = open(os.path.join(project_path, ".gitignore"),"x")
