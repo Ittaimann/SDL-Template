@@ -107,7 +107,7 @@ def select_generator(generators):
     print_generators(generators)
     not_selected = True
     while not_selected:
-        selection = input("Which generator?")
+        selection = input("Which generator?\n")
         if int(selection) in range(0, len(generators)):
             return generators[int(selection)]
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     print("""Welcome the sdl bootstrapper! This is just to get started with sdl.
             This script will builds a cmake project and pull sdl2 for you!
             it will also set up a local git repo for you, but not the remote (no easy github (ಥ⌣ಥ))""")
-    project_name = input("what is the name of your project?")
+    project_name = input("what is the name of your project?\n")
     version_text = subprocess.run(["cmake", "--version"], capture_output=True,text=True) 
     version = version_text.stdout.split("\n")[0].split(" ")[-1]
 
