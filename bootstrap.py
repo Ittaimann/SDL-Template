@@ -11,7 +11,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(external/SDL)
 add_executable(%REPO_NAME% main.cpp)
 target_include_directories(%REPO_NAME% PUBLIC external/SDL/include)
-target_link_libraries(%REPO_NAME% SDL2)
+
+if(TARGET SDL2::SDL2main)
+    # It has an implicit dependency on SDL2 functions, so it MUST be added before SDL2::SDL2 (or SDL2::SDL2-static)
+    target_link_libraries(%REPO_NAME% PRIVATE SDL2::SDL2main)
+endif()
+target_link_libraries(%REPO_NAME% PRIVATE SDL2-static)
 """
 
 MAIN_CPP_TEMPLATE= """
@@ -49,6 +54,7 @@ int main(int argc, char *argv[])
     SDL_UpdateWindowSurface(window);
 
     SDL_Delay(5000);
+    return 0;
 }
 """
 
@@ -73,9 +79,9 @@ if __name__ == "__main__":
     parser.add_argument('-b', dest="build", action="store_true", help='builds project')
 
     args = parser.parse_args()
-    if(args.regen != None):
+    if(args.regen):
         generate()
-    if(args.build != None):
+    if(args.build):
         build()
 
 """
@@ -154,6 +160,5 @@ if __name__ == "__main__":
     if os.name == 'nt':
         python_executable = "py" #pray
 
-    subprocess.run([python_executable,"build.py", "-g"],cwd=project_path) 
-    subprocess.run([python_executable,"build.py", "-b"],cwd=project_path) 
+    subprocess.run([python_executable,"build.py", "-g", "-b"],cwd=project_path) 
     
