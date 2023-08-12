@@ -2,6 +2,16 @@
 import os
 import subprocess
 
+SPLASH ="""
+  ______   ______   _____      ______      ___      ___      ___    _________  ________  _______     
+.' ____ \ |_   _ `.|_   _|    |_   _ \   .'   `.  .'   `.  .'   `. |  _   _  ||_   __  ||_   __ \    
+| (___ \_|  | | `. \ | |        | |_) | /  .-.  \/  .-.  \/  .-.  \|_/ | | \_|  | |_ \_|  | |__) |   
+ _.____`.   | |  | | | |   _    |  __'. | |   | || |   | || |   | |    | |      |  _| _   |  __ /    
+| \____) | _| |_.' /_| |__/ |  _| |__) |\  `-'  /\  `-'  /\  `-'  /   _| |_    _| |__/ | _| |  \ \_  
+ \______.'|______.'|________| |_______/  `.___.'  `.___.'  `.___.'   |_____|  |________||____| |___| 
+
+"""
+
 CMAKE_TEMPLATE = """
 cmake_minimum_required(VERSION %CMAKE_VERSION%)
 
@@ -101,29 +111,56 @@ def find_generators(generators_text):
 
 def print_generators(generators):
     for gen in generators:
-        print(f"[{generators.index(gen)}]:{gen}")
+        print(f"\t\t[{generators.index(gen)}]:{gen}")
 
 def select_generator(generators):
-    print("select your build system!, id suggest visual studio if you have windows and make or ninja for anything else")
     print_generators(generators)
     not_selected = True
+
+    print("Select your build system!, id suggest visual studio if you have windows and make or ninja for anything else")
     while not_selected:
         selection = input("Which generator?\n")
         if int(selection) in range(0, len(generators)):
+            print("(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧")
             return generators[int(selection)]
 
 if __name__ == "__main__":
-    print("""Welcome the sdl bootstrapper! This is just to get started with sdl.
-            This script will builds a cmake project and pull sdl2 for you!
-            it will also set up a local git repo for you, but not the remote (no easy github (ಥ⌣ಥ))""")
-    project_name = input("what is the name of your project?\n")
+    print(SPLASH)
+
+    print("""
+Welcome the silly sdl bootstrapper! This is just to get quickly started with sdl by doing a couple things
+\t\t\t\t(*・‿・)ノ⌒*:･ﾟ✧ 
+\t\t[1] Pulls the SDL library for you
+\t\t[2] makes a git repo for you and sets up the submodules
+\t\t[3] sets up a cmake project for you (minimally)
+\t\t[4] builds and links the default main.cpp 
+\t\t[5] Provides you with a build script you can run 	
+
+Things I can't promise you:  
+\t\t\t\t(╥﹏╥)
+\t\t[1] You will have to select a generator which cmake may say is there... but isn't
+\t\t[2] it might not build 
+\t\t[3] cmake might not be actually proper
+\t\t[4] won't teach you how cmake works
+\t\t[5] won't work on every platform (not tested on macos)
+\t\t[6] will likely break as I didn't really do any kind of protective programmings
+\t\t[7] will by default only build in debug (experiment with the cmake, get those frames back!)
+\t\t[8] won't set up your debugger or code completion tool 
+
+Warnings: ಠ_ಠ
+\t\t[1] This does make a new directory where it is run. Make sure the name is unique
+
+Tiny notes:
+\t\t[1] if on windows maybe try this script via the developer prompt
+""")
+
+    project_name = input("Lets get started! Whats you projects name (no spaces are crazy symbols pls)?\n")
     version_text = subprocess.run(["cmake", "--version"], capture_output=True,text=True) 
     version = version_text.stdout.split("\n")[0].split(" ")[-1]
 
     generators_text = subprocess.run(["cmake", "--help"], capture_output=True,text=True).stdout.split("Generators")[1] 
-    generators = find_generators(generators_text)
-
-    generator = select_generator(generators)
+    generators_list = find_generators(generators_text)
+    generator = select_generator(generators_list)
     
     dir_path = os.path.dirname(os.path.realpath(__file__))
     project_path = os.path.join(dir_path,project_name) 
@@ -156,4 +193,14 @@ if __name__ == "__main__":
         python_executable = "py" #pray
 
     subprocess.run([python_executable,"build.py", "-g", "-b"],cwd=project_path) 
-    
+    print("And done! In order to run your executable look under the /build folder in your new project!")
+    print(f"On windows, your executable will likely be under build/debug/{project_name}")
+    print("windows anti virus may also throw a warning, but building the project should clear it")
+    print("""
+ __                         _       _            
+/ _\ ___  ___ _   _  __ _  | | __ _| |_ ___ _ __ 
+\ \ / _ \/ _ \ | | |/ _` | | |/ _` | __/ _ \ '__|
+_\ \  __/  __/ |_| | (_| | | | (_| | ||  __/ |   
+\__/\___|\___|\__, |\__,_| |_|\__,_|\__\___|_|   
+              |___/
+""")
