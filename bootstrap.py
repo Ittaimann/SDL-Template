@@ -12,6 +12,9 @@ add_subdirectory(external/SDL)
 add_executable(%REPO_NAME% main.cpp)
 target_include_directories(%REPO_NAME% PUBLIC external/SDL/include)
 
+if(MSVC)
+    set_property(DIRECTORY ${PROJECT_ROOT} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+endif()
 if(TARGET SDL2::SDL2main)
     # It has an implicit dependency on SDL2 functions, so it MUST be added before SDL2::SDL2 (or SDL2::SDL2-static)
     target_link_libraries(%REPO_NAME% PRIVATE SDL2::SDL2main)
@@ -20,41 +23,33 @@ target_link_libraries(%REPO_NAME% PRIVATE SDL2-static)
 """
 
 MAIN_CPP_TEMPLATE= """
-#include<SDL.h>
-#include <iostream>
+//SDL2 Template project from : https://trenki2.github.io/blog/2017/06/02/using-sdl2-with-cmake/
+#include <SDL.h> 
 
 int main(int argc, char *argv[])
 {
-    if(SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        std::cout << "Failed to initialize the SDL2 library\\n";
-        return -1;
-    }
+  SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window *window = SDL_CreateWindow("SDL2 Window",
-                                          SDL_WINDOWPOS_CENTERED,
-                                          SDL_WINDOWPOS_CENTERED,
-                                          680, 480,
-                                          0);
+  SDL_Window *window = SDL_CreateWindow(
+    "SDL2Test",
+    SDL_WINDOWPOS_UNDEFINED,
+    SDL_WINDOWPOS_UNDEFINED,
+    640,
+    480,
+    0
+  );
 
-    if(!window)
-    {
-        std::cout << "Failed to create window\\n";
-        return -1;
-    }
+  SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+  SDL_RenderClear(renderer);
+  SDL_RenderPresent(renderer);
 
-    SDL_Surface *window_surface = SDL_GetWindowSurface(window);
+  SDL_Delay(3000);
 
-    if(!window_surface)
-    {
-        std::cout << "Failed to get the surface from the window\\n";
-        return -1;
-    }
+  SDL_DestroyWindow(window);
+  SDL_Quit();
 
-    SDL_UpdateWindowSurface(window);
-
-    SDL_Delay(5000);
-    return 0;
+  return 0;
 }
 """
 
